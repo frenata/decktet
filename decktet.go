@@ -2,6 +2,7 @@ package decktet
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/frenata/gaga"
 )
@@ -40,9 +41,65 @@ func (d *DecktetCard) String() string {
 	}
 }
 
+func ShortPrint(cards []*DecktetCard) string {
+	var s string
+	for _, c := range cards {
+		s += ShortPrintCard(c) + " "
+	}
+	return s
+}
+
+func ShortPrintCard(card *DecktetCard) string {
+	s := shortRank(card.rank)
+	for _, suit := range card.suits {
+		s += shortSuit(suit)
+	}
+	if len(card.suits) == 1 {
+		s += " "
+	}
+	return s
+}
+
+func (d *DecktetCard) Cats() []category {
+	return d.cats
+}
+func (d *DecktetCard) Suits() []suit {
+	return d.suits
+}
+func (d *DecktetCard) Rank() rank {
+	return d.rank
+}
+func (d *DecktetCard) Name() string {
+	return d.name
+}
+
 type rank int
 type suit string
 type category string
+
+func shortRank(r rank) string {
+	switch r {
+	case Ace:
+		return "A"
+	case Pawn:
+		return "P"
+	case Court:
+		return "C"
+	case Crown:
+		return "X"
+	default:
+		return strconv.Itoa(int(r))
+	}
+}
+
+func shortSuit(s suit) string {
+	switch s {
+	case Wyrms:
+		return "Y"
+	default:
+		return string(s[:1])
+	}
+}
 
 func (r rank) String() string {
 	switch r {
