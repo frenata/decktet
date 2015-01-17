@@ -77,13 +77,62 @@ func isPerson(card *DecktetCard) bool {
 	return false
 }
 
+// func evalutate possible claim
+// target card. list of cards, can it be claimed, and what's the overage
+
+// func find combinations
+// target card, a big list of cards, figure out all combinations that could apply
+// first all cards that match at least one suit
+// find all possible combinations (or is it permutations?) of sublist that matches suit,
+// then call our evaluate function
+// return the "best" / most efficient
+
+// func check targets
+// given the gamestate
+// find combos and evaluate for all targets
+// store the overages into a map of some kind
+
+// func decide
+// take the map from check targets
+// pick the best card to claim
+
+// various versions of decide
+//
+
+// suns, moons
+
 func main() {
 	player := NewAdamanPlayer()
 	deck := NewDecktet(BasicDeck)
 
 	deck.Shuffle(-1)
+	fmt.Println(countSuits(deck.Shuffled, true))
+	fmt.Println(countSuits(deck.Shuffled, false))
 	player.dealAll(deck)
 
 	fmt.Println(player)
-	//fmt.Printf("Resources: %v, Capital: %v, Palace: %v.\n", len(player.resources), len(player.capital), len(player.palace))
+	fmt.Println(countSuits(deck.Shuffled, true))
+	fmt.Println(countSuits(deck.Shuffled, false))
+}
+
+func rankToInt(c *DecktetCard) int {
+	r := c.Rank()
+	if r == Crown {
+		return 10
+	} else {
+		return int(r)
+	}
+}
+
+func countSuits(cards []gaga.Card, onlyPersons bool) map[string]int {
+	m := make(map[string]int)
+	for _, g := range cards {
+		c := g.(*DecktetCard)
+		if isPerson(c) || !onlyPersons {
+			for _, s := range c.Suits() {
+				m[string(s)] += rankToInt(c)
+			}
+		}
+	}
+	return m
 }

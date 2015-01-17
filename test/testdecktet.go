@@ -11,8 +11,7 @@ func main() {
 	//fmt.Println(ranks)
 	//fmt.Println(decktet.Ace < ranks[1])
 	//fmt.Println(decktet.Ace + decktet.Two)
-	d := decktet.NewDecktet(decktet.BasicDeck)
-	d.Shuffle(-1)
+	d := decktet.BasicDeck
 
 	fmt.Printf("%v\n", d.Shuffled[0])
 }
