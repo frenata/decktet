@@ -60,6 +60,17 @@ func ShortPrintCard(card *DecktetCard) string {
 	return s
 }
 
+func SuitMatch(one, two *DecktetCard) bool {
+	for _, s1 := range one.suits {
+		for _, s2 := range two.suits {
+			if s1 == s2 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (d *DecktetCard) Cats() []category {
 	return d.cats
 }
