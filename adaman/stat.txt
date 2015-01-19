@@ -1,0 +1,26 @@
+prefix, whie discarding claimed non-persons:
+win%:    0.1%
+loss%:   76.1%
+totalL%: 23.7%
+average score: 31
+
+postfix, pure efficiency algorithm:
+win%:    0.38%
+loss%:   88.7%
+totalL%: 10.9%
+average score: 36
+
+!suns/moons suits evaluated as +N less efficient:
++4
+win%:    0.6%
++5
+win%:    0.84%
++6
+win%:    0.77%
++7
+win%:    0.73%
++8
+win%:    0.55%
+average score: 30
+
+

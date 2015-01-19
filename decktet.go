@@ -82,6 +82,15 @@ func PopDecktetCard(c *DecktetCard, s []*DecktetCard) bool {
 	return false
 }
 
+func HasSuit(c *DecktetCard, s suit) bool {
+	for _, x := range c.Suits() {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
 func (d *DecktetCard) Cats() []category {
 	return d.cats
 }

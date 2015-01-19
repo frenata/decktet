@@ -117,10 +117,8 @@ func findCombos(target *DecktetCard, cards []*DecktetCard) (claim []*DecktetCard
 	var best []*DecktetCard
 	var lowscore int = 100
 	for _, c := range combos {
-		//fmt.Println(c)
 		dc := toDecktetSlice(c)
 		score := evalClaim(target, dc)
-		//fmt.Println(score)
 		if score < 0 {
 			continue
 		} else if score < lowscore {
@@ -145,8 +143,6 @@ func (p *AdamanPlayer) checkTargets() {
 		p.palaceClaims[c] = findCombos(c, p.resources)
 	}
 
-	//fmt.Println("Capital Claims:\n", p.capitalClaims)
-	//fmt.Println("Palace Claims:\n", p.palaceClaims)
 }
 
 // func decide
@@ -160,6 +156,10 @@ func (p *AdamanPlayer) decideEfficient() bool {
 	p.checkTargets()
 	for k, v := range p.palaceClaims {
 		score := evalClaim(k, v)
+		// push this to antoher decide function
+		if !HasSuit(k, Suns) && !HasSuit(k, Moons) {
+			score += 5
+		}
 		if score < lowscore && score >= 0 {
 			target = k
 			claim = v
@@ -168,6 +168,9 @@ func (p *AdamanPlayer) decideEfficient() bool {
 	}
 	for k, v := range p.capitalClaims {
 		score := evalClaim(k, v)
+		if !HasSuit(k, Suns) && !HasSuit(k, Moons) {
+			score += 5
+		}
 		if score < lowscore && score >= 0 {
 			target = k
 			claim = v
@@ -178,7 +181,7 @@ func (p *AdamanPlayer) decideEfficient() bool {
 	if target == nil {
 		return false
 	} else {
-		fmt.Printf("Decided: claim %v with %v for %v overpayment.\n", ShortPrintCard(target), ShortPrint(claim), lowscore)
+		//fmt.Printf("Decided: claim %v with %v for %v overpayment.\n", ShortPrintCard(target), ShortPrint(claim), lowscore)
 		p.claim(target, claim)
 		return true
 	}
@@ -227,16 +230,18 @@ func (p *AdamanPlayer) claim(target *DecktetCard, claim []*DecktetCard) {
 	// make/add a count of how many cards have been claimed
 	if isPerson(target) {
 		p.discard = append(p.discard, target)
+	} else { // target is a resource (claimed from capital), add it to resource row
+		p.resources = append(p.resources, target)
 	}
 
 }
 
 func (p *AdamanPlayer) isGameOver() (result string) {
 	if len(p.palace) > 5 {
-		fmt.Println("palace overfull")
+		//fmt.Println("palace overfull")
 		return "total loss"
 	} else if len(p.discard) == 11 {
-		fmt.Println("all people captured")
+		//fmt.Println("all people captured")
 		return "win"
 	} else {
 		return ""
@@ -248,11 +253,11 @@ func (p *AdamanPlayer) Play(deck *gaga.Deck) int {
 	var round int
 	for result == "" {
 		round++
-		fmt.Printf("Round %v!\n", round)
+		//fmt.Printf("Round %v!\n", round)
 		if len(deck.Shuffled) > 0 {
 			p.dealAll(deck)
 		}
-		fmt.Println(p)
+		//fmt.Println(p)
 		//fmt.Println(countSuits(deck.Shuffled, true))
 		//fmt.Println(countSuits(deck.Shuffled, false))
 		result = p.isGameOver()
@@ -261,12 +266,12 @@ func (p *AdamanPlayer) Play(deck *gaga.Deck) int {
 		}
 		if !p.decideEfficient() {
 			result = "loss"
-			fmt.Println("no more decisions possible")
+			//fmt.Println("no more decisions possible")
 		}
 	}
 
-	fmt.Println("Final table", p)
-	fmt.Println("Captured: ", ShortPrint(p.discard))
+	//fmt.Println("Final table", p)
+	//fmt.Println("Captured: ", ShortPrint(p.discard))
 	return p.score(result)
 }
 
