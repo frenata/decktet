@@ -1,4 +1,4 @@
-package main
+package adaman
 
 import (
 	"fmt"
@@ -57,6 +57,9 @@ func (p *AdamanPlayer) String() string {
 
 func (p *AdamanPlayer) dealAll(d *gaga.Deck) {
 	for len(p.capital) != 5 || len(p.resources) != 5 {
+		if len(d.Shuffled) == 0 {
+			return
+		}
 		d.Deal(p)
 		//fmt.Printf("left in (shuffled) deck: %v\n", len(d.Shuffled))
 	}
@@ -253,6 +256,9 @@ func (p *AdamanPlayer) Play(deck *gaga.Deck) int {
 		//fmt.Println(countSuits(deck.Shuffled, true))
 		//fmt.Println(countSuits(deck.Shuffled, false))
 		result = p.isGameOver()
+		if result != "" {
+			break
+		}
 		if !p.decideEfficient() {
 			result = "loss"
 			fmt.Println("no more decisions possible")
@@ -283,39 +289,9 @@ func (p *AdamanPlayer) score(result string) int {
 	case "win":
 		return totalP + totalR
 	default:
+		panic("bad end condition")
 		return -1
 	}
-}
-
-func main() {
-	player := NewAdamanPlayer()
-	deck := NewDecktet(BasicDeck)
-
-	deck.Shuffle(1)
-	fmt.Println(countSuits(deck.Shuffled, true))
-	fmt.Println(countSuits(deck.Shuffled, false))
-
-	score := player.Play(deck)
-	fmt.Println(score)
-
-	//fmt.Println(evalClaim(player.capital[0], player.resources))
-	//fmt.Println(findCombos(player.capital[0], player.resources))
-	//player.decideEfficient()
-
-	/*
-		fmt.Println("combos of 3")
-		fmt.Println(gaga.Combination(3))
-		fmt.Println("combos of 4")
-		fmt.Println(gaga.Combination(4))
-		fmt.Println("combos of 5")
-		fmt.Println(gaga.Combination(5))
-
-		combos := gaga.CardCombinations(toCardSlice(player.resources))
-
-		for _, c := range combos {
-			fmt.Println(ShortPrint(toDecktetSlice(c)))
-		}
-	*/
 }
 
 func toCardSlice(dc []*DecktetCard) (c []gaga.Card) {
