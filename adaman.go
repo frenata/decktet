@@ -9,6 +9,7 @@ import (
 
 type AdamanPlayer struct {
 	name          string
+	deck          *gaga.Deck
 	resources     []*DecktetCard
 	capital       []*DecktetCard
 	palace        []*DecktetCard
@@ -19,6 +20,7 @@ type AdamanPlayer struct {
 
 func NewAdamanPlayer() *AdamanPlayer {
 	p := new(AdamanPlayer)
+	p.deck = NewDecktet(BasicDeck)
 	p.resources = make([]*DecktetCard, 0, 5)
 	p.capital = make([]*DecktetCard, 0, 5)
 	p.palace = make([]*DecktetCard, 0, 5)
@@ -27,6 +29,10 @@ func NewAdamanPlayer() *AdamanPlayer {
 	p.capitalClaims = make(map[*DecktetCard][]*DecktetCard)
 	p.palaceClaims = make(map[*DecktetCard][]*DecktetCard)
 	return p
+}
+
+func (p *AdamanPlayer) Shuffle(seed int) {
+	p.deck.Shuffle(seed)
 }
 
 func (p *AdamanPlayer) AddCard(c gaga.Card) {
@@ -55,12 +61,12 @@ func (p *AdamanPlayer) String() string {
 	return pal + c + r
 }
 
-func (p *AdamanPlayer) dealAll(d *gaga.Deck) {
+func (p *AdamanPlayer) dealAll() {
 	for len(p.capital) != 5 || len(p.resources) != 5 {
-		if len(d.Shuffled) == 0 {
+		if len(p.deck.Shuffled) == 0 {
 			return
 		}
-		d.Deal(p)
+		p.deck.Deal(p)
 		//fmt.Printf("left in (shuffled) deck: %v\n", len(d.Shuffled))
 	}
 }
@@ -88,7 +94,7 @@ func isPerson(card *DecktetCard) bool {
 
 // func evalutate possible claim
 // target card. list of cards, can it be claimed, and what's the overage
-func evalClaim(target *DecktetCard, cards []*DecktetCard) int {
+func (p *AdamanPlayer) evalClaim(target *DecktetCard, cards []*DecktetCard) int {
 	// list should already match suits
 	var targetV, listV int
 	targetV = rankToInt(target)
@@ -98,13 +104,60 @@ func evalClaim(target *DecktetCard, cards []*DecktetCard) int {
 	return listV - targetV
 }
 
+func (p *AdamanPlayer) adjClaim(target *DecktetCard, cards []*DecktetCard) float64 {
+
+	var targetI int
+	var targetF, listF float64
+
+	targetI = rankToInt(target)
+	targetF = float64(targetI) * p.cardValue(target, true)
+
+	for _, c := range cards {
+		v := rankToInt(c)
+		f := p.cardValue(c, false)
+		listF = listF + (float64(v) * f)
+	}
+	return listF - targetF
+}
+
+func (p *AdamanPlayer) cardValue(card *DecktetCard, target bool) (total float64) {
+	count := countSuits(p.deck.Shuffled, true)
+	values := make(map[string]float64)
+
+	for k, v := range count {
+		values[k] = float64(v) / 55
+	}
+
+	for _, s := range card.Suits() {
+		total += values[string(s)]
+	}
+	/*var bestTarget float64 = 100
+	for _, s := range card.Suits() {
+		tmp := values[string(s)]
+		if target {
+			if tmp < bestTarget {
+				bestTarget = tmp
+			}
+		} else {
+			if tmp > best {
+				best = tmp
+			}
+		}
+	}
+
+	if best == 0 && bestTarget != 100 {
+		best = bestTarget
+	}*/
+	return total
+}
+
 // func find combinations
 // target card, a big list of cards, figure out all combinations that could apply
 // first all cards that match at least one suit
 // find all possible combinations (or is it permutations?) of sublist that matches suit,
 // then call our evaluate function
 // return the "best" / most efficient
-func findCombos(target *DecktetCard, cards []*DecktetCard) (claim []*DecktetCard) {
+func (p *AdamanPlayer) findCombos(target *DecktetCard, cards []*DecktetCard) (claim []*DecktetCard) {
 	var matching []*DecktetCard
 	for _, c := range cards { // only consider cards that match a suit
 		if SuitMatch(target, c) {
@@ -115,11 +168,12 @@ func findCombos(target *DecktetCard, cards []*DecktetCard) (claim []*DecktetCard
 	combos := gaga.CardCombinations(toCardSlice(matching))
 
 	var best []*DecktetCard
-	var lowscore int = 100
+	var lowscore float64 = 100
 	for _, c := range combos {
 		dc := toDecktetSlice(c)
-		score := evalClaim(target, dc)
-		if score < 0 {
+		// score := p.evalClaim(target,dc)
+		score := p.adjClaim(target, dc)
+		if p.evalClaim(target, dc) < 0 {
 			continue
 		} else if score < lowscore {
 			best = dc
@@ -136,11 +190,11 @@ func findCombos(target *DecktetCard, cards []*DecktetCard) (claim []*DecktetCard
 // store the overages into a map of some kind
 func (p *AdamanPlayer) checkTargets() {
 	for _, c := range p.capital {
-		p.capitalClaims[c] = findCombos(c, p.resources)
+		p.capitalClaims[c] = p.findCombos(c, p.resources)
 	}
 
 	for _, c := range p.palace {
-		p.palaceClaims[c] = findCombos(c, p.resources)
+		p.palaceClaims[c] = p.findCombos(c, p.resources)
 	}
 
 }
@@ -155,7 +209,39 @@ func (p *AdamanPlayer) decideEfficient() bool {
 
 	p.checkTargets()
 	for k, v := range p.palaceClaims {
-		score := evalClaim(k, v)
+		score := p.evalClaim(k, v)
+		if score < lowscore && score >= 0 {
+			target = k
+			claim = v
+			lowscore = score
+		}
+	}
+	for k, v := range p.capitalClaims {
+		score := p.evalClaim(k, v)
+		if score < lowscore && score >= 0 {
+			target = k
+			claim = v
+			lowscore = score
+		}
+	}
+
+	if target == nil {
+		return false
+	} else {
+		//fmt.Printf("Decided: claim %v with %v for %v overpayment.\n", ShortPrintCard(target), ShortPrint(claim), lowscore)
+		p.claim(target, claim)
+		return true
+	}
+}
+
+func (p *AdamanPlayer) decideAdj() bool {
+	var target *DecktetCard
+	var claim []*DecktetCard
+	var lowscore float64 = 100
+
+	p.checkTargets()
+	for k, v := range p.palaceClaims {
+		score := float64(p.evalClaim(k, v))
 		// push this to antoher decide function
 		if !HasSuit(k, Suns) && !HasSuit(k, Moons) {
 			score += 5
@@ -167,7 +253,7 @@ func (p *AdamanPlayer) decideEfficient() bool {
 		}
 	}
 	for k, v := range p.capitalClaims {
-		score := evalClaim(k, v)
+		score := float64(p.evalClaim(k, v))
 		if !HasSuit(k, Suns) && !HasSuit(k, Moons) {
 			score += 5
 		}
@@ -186,6 +272,12 @@ func (p *AdamanPlayer) decideEfficient() bool {
 		return true
 	}
 }
+
+// dyanmic scoring
+// assign value to each suit: x/55 where x = the number of personality "total ranks" left in the shuffle
+// card value = both it's suit values added (OR: the most valuable suit?) * rank
+// claim value = target value - all cards in claim stack value (= surplus value claimed)
+// will have to check this both places (initial check and then decision) or add data to map/struct
 
 func (p *AdamanPlayer) pop(c *DecktetCard, ps *[]*DecktetCard) bool {
 	s := *ps
@@ -248,14 +340,14 @@ func (p *AdamanPlayer) isGameOver() (result string) {
 	}
 }
 
-func (p *AdamanPlayer) Play(deck *gaga.Deck) int {
+func (p *AdamanPlayer) Play() int {
 	var result string
 	var round int
 	for result == "" {
 		round++
 		//fmt.Printf("Round %v!\n", round)
-		if len(deck.Shuffled) > 0 {
-			p.dealAll(deck)
+		if len(p.deck.Shuffled) > 0 {
+			p.dealAll()
 		}
 		//fmt.Println(p)
 		//fmt.Println(countSuits(deck.Shuffled, true))
@@ -264,7 +356,7 @@ func (p *AdamanPlayer) Play(deck *gaga.Deck) int {
 		if result != "" {
 			break
 		}
-		if !p.decideEfficient() {
+		if !p.decideAdj() {
 			result = "loss"
 			//fmt.Println("no more decisions possible")
 		}

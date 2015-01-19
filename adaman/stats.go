@@ -9,12 +9,11 @@ import (
 )
 
 func oneGame() int {
-	deck := decktet.NewDecktet(decktet.BasicDeck)
 	player := decktet.NewAdamanPlayer()
 
-	deck.Shuffle(-1)
+	player.Shuffle(-1)
 
-	score := player.Play(deck)
+	score := player.Play()
 	return score
 }
 

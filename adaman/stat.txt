@@ -23,4 +23,10 @@ win%:    0.73%
 win%:    0.55%
 average score: 30
 
+decide function accounting for cards left in deck
+win%:    1.55%
+loss%:   90%
+totalL%: 8.4%
+average score: 33
+
 
