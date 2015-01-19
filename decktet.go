@@ -71,6 +71,17 @@ func SuitMatch(one, two *DecktetCard) bool {
 	return false
 }
 
+func PopDecktetCard(c *DecktetCard, s []*DecktetCard) bool {
+	for i, v := range s {
+		if c == v {
+			//fmt.Println(s)
+			s = append(s[:i], s[i+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
 func (d *DecktetCard) Cats() []category {
 	return d.cats
 }

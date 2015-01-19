@@ -58,6 +58,7 @@ func (p *AdamanPlayer) String() string {
 func (p *AdamanPlayer) dealAll(d *gaga.Deck) {
 	for len(p.capital) != 5 || len(p.resources) != 5 {
 		d.Deal(p)
+		//fmt.Printf("left in (shuffled) deck: %v\n", len(d.Shuffled))
 	}
 }
 
@@ -148,12 +149,20 @@ func (p *AdamanPlayer) checkTargets() {
 // func decide
 // take the map from check targets
 // pick the best card to claim
-func (p *AdamanPlayer) decideEfficient() {
+func (p *AdamanPlayer) decideEfficient() bool {
 	var target *DecktetCard
 	var claim []*DecktetCard
 	var lowscore int = 100
 
 	p.checkTargets()
+	for k, v := range p.palaceClaims {
+		score := evalClaim(k, v)
+		if score < lowscore && score >= 0 {
+			target = k
+			claim = v
+			lowscore = score
+		}
+	}
 	for k, v := range p.capitalClaims {
 		score := evalClaim(k, v)
 		if score < lowscore && score >= 0 {
@@ -163,40 +172,135 @@ func (p *AdamanPlayer) decideEfficient() {
 		}
 	}
 
-	fmt.Printf("Decided: claim %v with %v for %v overpayment.\n", ShortPrintCard(target), ShortPrint(claim), lowscore)
-	p.Play(target, claim)
+	if target == nil {
+		return false
+	} else {
+		fmt.Printf("Decided: claim %v with %v for %v overpayment.\n", ShortPrintCard(target), ShortPrint(claim), lowscore)
+		p.claim(target, claim)
+		return true
+	}
 }
 
-func (p *AdamanPlayer) Play(target *DecktetCard, claim []*DecktetCard) {
-	// find where the target is
+func (p *AdamanPlayer) pop(c *DecktetCard, ps *[]*DecktetCard) bool {
+	s := *ps
+	for i, v := range s {
+		if c == v {
+			s = append(s[:i], s[i+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
+func (p *AdamanPlayer) claim(target *DecktetCard, claim []*DecktetCard) {
 	// remove the target from capital/palace row
-	// remove claim from map
+	for i, v := range p.palace {
+		if target == v {
+			p.palace = append(p.palace[:i], p.palace[i+1:]...)
+			delete(p.palaceClaims, target) // clean map
+			break
+		}
+	}
+
+	for i, v := range p.capital {
+		if target == v {
+			p.capital = append(p.capital[:i], p.capital[i+1:]...)
+			delete(p.capitalClaims, target)
+			break
+		}
+	}
+
 	// remove claim cards from resource row
+	for _, c := range claim {
+		for i, v := range p.resources {
+			if c == v {
+				p.resources = append(p.resources[:i], p.resources[i+1:]...)
+				break
+			}
+		}
+	}
+
 	// discard all used cards
 	// make/add a count of how many cards have been claimed
+	if isPerson(target) {
+		p.discard = append(p.discard, target)
+	}
+
 }
 
-// various versions of decide
-//
+func (p *AdamanPlayer) isGameOver() (result string) {
+	if len(p.palace) > 5 {
+		fmt.Println("palace overfull")
+		return "total loss"
+	} else if len(p.discard) == 11 {
+		fmt.Println("all people captured")
+		return "win"
+	} else {
+		return ""
+	}
+}
 
-// suns, moons
+func (p *AdamanPlayer) Play(deck *gaga.Deck) int {
+	var result string
+	var round int
+	for result == "" {
+		round++
+		fmt.Printf("Round %v!\n", round)
+		if len(deck.Shuffled) > 0 {
+			p.dealAll(deck)
+		}
+		fmt.Println(p)
+		//fmt.Println(countSuits(deck.Shuffled, true))
+		//fmt.Println(countSuits(deck.Shuffled, false))
+		result = p.isGameOver()
+		if !p.decideEfficient() {
+			result = "loss"
+			fmt.Println("no more decisions possible")
+		}
+	}
+
+	fmt.Println("Final table", p)
+	fmt.Println("Captured: ", ShortPrint(p.discard))
+	return p.score(result)
+}
+
+func (p *AdamanPlayer) score(result string) int {
+	var totalP, totalR int
+
+	for _, c := range p.discard {
+		totalP += rankToInt(c)
+	}
+
+	for _, c := range p.resources {
+		totalR += rankToInt(c)
+	}
+
+	switch result {
+	case "total loss":
+		return 0
+	case "loss":
+		return totalP
+	case "win":
+		return totalP + totalR
+	default:
+		return -1
+	}
+}
 
 func main() {
 	player := NewAdamanPlayer()
 	deck := NewDecktet(BasicDeck)
 
-	deck.Shuffle(-1)
+	deck.Shuffle(1)
 	fmt.Println(countSuits(deck.Shuffled, true))
 	fmt.Println(countSuits(deck.Shuffled, false))
-	player.dealAll(deck)
 
-	fmt.Println(player)
-	fmt.Println(countSuits(deck.Shuffled, true))
-	fmt.Println(countSuits(deck.Shuffled, false))
+	score := player.Play(deck)
+	fmt.Println(score)
 
 	//fmt.Println(evalClaim(player.capital[0], player.resources))
 	//fmt.Println(findCombos(player.capital[0], player.resources))
-	player.decideEfficient()
+	//player.decideEfficient()
 
 	/*
 		fmt.Println("combos of 3")
