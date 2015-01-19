@@ -1,10 +1,10 @@
-package adaman
+package decktet
 
 import (
 	"fmt"
 
 	"github.com/frenata/gaga"
-	. "github.com/frenata/gaga/decktet"
+	//. "github.com/frenata/gaga/decktet"
 )
 
 type AdamanPlayer struct {
