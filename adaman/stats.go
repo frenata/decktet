@@ -1,3 +1,4 @@
+// Adaman AI Game, run x of games and run stats.
 package main
 
 import (
