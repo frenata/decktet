@@ -1,15 +1,15 @@
-package decktet
+package main
 
 import (
 	"fmt"
 
-	"github.com/frenata/gaga"
-	//. "github.com/frenata/gaga/decktet"
+	"github.com/frenata/deck"
+	. "github.com/frenata/decktet"
 )
 
 type AdamanPlayer struct {
 	name          string
-	deck          *gaga.Deck
+	deck          *deck.Deck
 	resources     []*DecktetCard
 	capital       []*DecktetCard
 	palace        []*DecktetCard
@@ -35,7 +35,7 @@ func (p *AdamanPlayer) Shuffle(seed int) {
 	p.deck.Shuffle(seed)
 }
 
-func (p *AdamanPlayer) AddCard(c gaga.Card) {
+func (p *AdamanPlayer) AddCard(c deck.Card) {
 	dc := c.(*DecktetCard)
 	if len(p.resources) < 5 {
 		p.addResource(dc)
@@ -165,7 +165,7 @@ func (p *AdamanPlayer) findCombos(target *DecktetCard, cards []*DecktetCard) (cl
 		}
 	}
 
-	combos := gaga.CardCombinations(toCardSlice(matching))
+	combos := deck.CardCombinations(toCardSlice(matching))
 
 	var best []*DecktetCard
 	var lowscore float64 = 100
@@ -391,14 +391,14 @@ func (p *AdamanPlayer) score(result string) int {
 	}
 }
 
-func toCardSlice(dc []*DecktetCard) (c []gaga.Card) {
-	c = make([]gaga.Card, len(dc))
+func toCardSlice(dc []*DecktetCard) (c []deck.Card) {
+	c = make([]deck.Card, len(dc))
 	for i := range dc {
 		c[i] = dc[i]
 	}
 	return c
 }
-func toDecktetSlice(c []gaga.Card) (dc []*DecktetCard) {
+func toDecktetSlice(c []deck.Card) (dc []*DecktetCard) {
 	dc = make([]*DecktetCard, len(c))
 	for i := range c {
 		dc[i] = c[i].(*DecktetCard)
@@ -415,7 +415,7 @@ func rankToInt(c *DecktetCard) int {
 	}
 }
 
-func countSuits(cards []gaga.Card, onlyPersons bool) map[string]int {
+func countSuits(cards []deck.Card, onlyPersons bool) map[string]int {
 	m := make(map[string]int)
 	for _, g := range cards {
 		c := g.(*DecktetCard)

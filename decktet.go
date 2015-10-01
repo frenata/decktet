@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/frenata/gaga"
+	"github.com/frenata/deck"
 )
 
 /*
@@ -23,7 +23,7 @@ type DecktetCard struct {
 	rank   rank
 	suits  []suit
 	cats   []category
-	played []gaga.Player
+	played []deck.Player
 }
 
 func (d *DecktetCard) String() string {
@@ -231,12 +231,12 @@ var BasicDeck = []*DecktetCard{
 	{"End", Crown, []suit{Leaves}, []category{Event, Place}, nil},
 }
 
-func NewDecktet(dc []*DecktetCard) *gaga.Deck {
-	c := make([]gaga.Card, len(dc))
+func NewDecktet(dc []*DecktetCard) *deck.Deck {
+	c := make([]deck.Card, len(dc))
 
 	for i := range dc {
 		c[i] = dc[i]
 	}
 
-	return gaga.NewDeck(c)
+	return deck.NewDeck(c)
 }

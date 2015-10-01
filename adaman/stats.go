@@ -6,11 +6,11 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/frenata/gaga/decktet"
+	//"github.com/frenata/decktet"
 )
 
 func oneGame() int {
-	player := decktet.NewAdamanPlayer()
+	player := NewAdamanPlayer()
 
 	player.Shuffle(-1)
 
