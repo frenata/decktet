@@ -20,7 +20,7 @@ type AdamanPlayer struct {
 
 func NewAdamanPlayer() *AdamanPlayer {
 	p := new(AdamanPlayer)
-	p.Deck = NewDecktet(BasicDeck)
+	p.Deck = BasicDeck
 	p.resources = make([]*DecktetCard, 0, 5)
 	p.capital = make([]*DecktetCard, 0, 5)
 	p.palace = make([]*DecktetCard, 0, 5)

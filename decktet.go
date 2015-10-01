@@ -192,7 +192,7 @@ const (
 
 var BasicRanks = [10]rank{Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Crown}
 
-var BasicDeck = []*DecktetCard{
+var BasicDeck = newDecktet([]*DecktetCard{
 	{"", Ace, []suit{Suns}, nil, nil},
 	{"", Ace, []suit{Moons}, nil, nil},
 	{"", Ace, []suit{Waves}, nil, nil},
@@ -229,14 +229,14 @@ var BasicDeck = []*DecktetCard{
 	{"Sea", Crown, []suit{Waves}, []category{Place}, nil},
 	{"Windfall", Crown, []suit{Knots}, []category{Event}, nil},
 	{"End", Crown, []suit{Leaves}, []category{Event, Place}, nil},
-}
+})
 
-func NewDecktet(dc []*DecktetCard) *deck.Deck {
+func newDecktet(dc []*DecktetCard) *deck.Deck {
 	c := make([]deck.Card, len(dc))
 
 	for i := range dc {
 		c[i] = dc[i]
 	}
 
-	return deck.NewDeck(c)
+	return deck.New(c)
 }
