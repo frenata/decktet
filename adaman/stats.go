@@ -10,7 +10,7 @@ import (
 )
 
 func oneGame(player *AdamanPlayer) int {
-	player.Shuffle(1)
+	player.Shuffle(-1)
 	score := player.Play()
 
 	//fmt.Println(player)
@@ -18,7 +18,7 @@ func oneGame(player *AdamanPlayer) int {
 	//fmt.Println(len(player.Cards()))
 	player.cleanup()
 	//fmt.Printf("cards: %s\ndiscards: %s\n", player.Cards(), player.Discards())
-	player.Shuffle(1)
+	player.Shuffle(-1)
 	//fmt.Printf("cards: %s\ndiscards: %s\n", player.Cards(), player.Discards())
 	//fmt.Println(len(player.Cards()))
 	return score
