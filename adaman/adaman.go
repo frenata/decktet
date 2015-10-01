@@ -165,7 +165,7 @@ func (p *AdamanPlayer) findCombos(target *DecktetCard, cards []*DecktetCard) (cl
 		}
 	}
 
-	combos := deck.CardCombinations(toCardSlice(matching))
+	combos := CardCombinations(toCardSlice(matching))
 
 	var best []*DecktetCard
 	var lowscore float64 = 100
