@@ -19,11 +19,10 @@ type Player interface {
 */
 
 type DecktetCard struct {
-	name   string
-	rank   rank
-	suits  []suit
-	cats   []category
-	played []deck.Player
+	name  string
+	rank  rank
+	suits []suit
+	cats  []category
 }
 
 func (d *DecktetCard) String() string {
@@ -192,43 +191,48 @@ const (
 
 var BasicRanks = [10]rank{Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Crown}
 
-var BasicDeck = newDecktet([]*DecktetCard{
-	{"", Ace, []suit{Suns}, nil, nil},
-	{"", Ace, []suit{Moons}, nil, nil},
-	{"", Ace, []suit{Waves}, nil, nil},
-	{"", Ace, []suit{Leaves}, nil, nil},
-	{"", Ace, []suit{Knots}, nil, nil},
-	{"", Ace, []suit{Wyrms}, nil, nil},
-	{"Author", Two, []suit{Moons, Knots}, []category{Person}, nil},
-	{"Origin", Two, []suit{Waves, Leaves}, []category{Event, Place}, nil},
-	{"Desert", Two, []suit{Suns, Wyrms}, []category{Place}, nil},
-	{"Journey", Three, []suit{Moons, Waves}, []category{Event}, nil},
-	{"Savage", Three, []suit{Leaves, Wyrms}, []category{Person}, nil},
-	{"Painter", Three, []suit{Suns, Knots}, []category{Person}, nil},
-	{"Mountain", Four, []suit{Moons, Suns}, []category{Place}, nil},
-	{"Battle", Four, []suit{Wyrms, Knots}, []category{Event}, nil},
-	{"Sailor", Four, []suit{Waves, Leaves}, []category{Person}, nil},
-	{"Discovery", Five, []suit{Suns, Waves}, []category{Event}, nil},
-	{"Soldier", Five, []suit{Wyrms, Knots}, []category{Person}, nil},
-	{"Forest", Five, []suit{Moons, Leaves}, []category{Place}, nil},
-	{"Penitent", Six, []suit{Suns, Wyrms}, []category{Person}, nil},
-	{"Lunatic", Six, []suit{Moons, Waves}, []category{Person}, nil},
-	{"Market", Six, []suit{Leaves, Knots}, []category{Event, Place}, nil},
-	{"Cave", Seven, []suit{Waves, Wyrms}, []category{Place}, nil},
-	{"Castle", Seven, []suit{Suns, Knots}, []category{Place}, nil},
-	{"Chance Meeting", Seven, []suit{Moons, Leaves}, []category{Event}, nil},
-	{"Betrayal", Eight, []suit{Wyrms, Knots}, []category{Event}, nil},
-	{"Mill", Eight, []suit{Waves, Leaves}, []category{Place}, nil},
-	{"Diplomat", Eight, []suit{Moons, Suns}, []category{Person}, nil},
-	{"Merchant", Nine, []suit{Leaves, Knots}, []category{Person}, nil},
-	{"Darkness", Nine, []suit{Waves, Wyrms}, []category{Place}, nil},
-	{"Pact", Nine, []suit{Moons, Suns}, []category{Event}, nil},
-	{"Calamity", Crown, []suit{Wyrms}, []category{Event}, nil},
-	{"Huntress", Crown, []suit{Moons}, []category{Person}, nil},
-	{"Bard", Crown, []suit{Suns}, []category{Person}, nil},
-	{"Sea", Crown, []suit{Waves}, []category{Place}, nil},
-	{"Windfall", Crown, []suit{Knots}, []category{Event}, nil},
-	{"End", Crown, []suit{Leaves}, []category{Event, Place}, nil},
+func BasicDeck() *deck.Deck {
+	bd := *basicDeck
+	return &bd
+}
+
+var basicDeck = newDecktet([]*DecktetCard{
+	{"", Ace, []suit{Suns}, nil},
+	{"", Ace, []suit{Moons}, nil},
+	{"", Ace, []suit{Waves}, nil},
+	{"", Ace, []suit{Leaves}, nil},
+	{"", Ace, []suit{Knots}, nil},
+	{"", Ace, []suit{Wyrms}, nil},
+	{"Author", Two, []suit{Moons, Knots}, []category{Person}},
+	{"Origin", Two, []suit{Waves, Leaves}, []category{Event, Place}},
+	{"Desert", Two, []suit{Suns, Wyrms}, []category{Place}},
+	{"Journey", Three, []suit{Moons, Waves}, []category{Event}},
+	{"Savage", Three, []suit{Leaves, Wyrms}, []category{Person}},
+	{"Painter", Three, []suit{Suns, Knots}, []category{Person}},
+	{"Mountain", Four, []suit{Moons, Suns}, []category{Place}},
+	{"Battle", Four, []suit{Wyrms, Knots}, []category{Event}},
+	{"Sailor", Four, []suit{Waves, Leaves}, []category{Person}},
+	{"Discovery", Five, []suit{Suns, Waves}, []category{Event}},
+	{"Soldier", Five, []suit{Wyrms, Knots}, []category{Person}},
+	{"Forest", Five, []suit{Moons, Leaves}, []category{Place}},
+	{"Penitent", Six, []suit{Suns, Wyrms}, []category{Person}},
+	{"Lunatic", Six, []suit{Moons, Waves}, []category{Person}},
+	{"Market", Six, []suit{Leaves, Knots}, []category{Event, Place}},
+	{"Cave", Seven, []suit{Waves, Wyrms}, []category{Place}},
+	{"Castle", Seven, []suit{Suns, Knots}, []category{Place}},
+	{"Chance Meeting", Seven, []suit{Moons, Leaves}, []category{Event}},
+	{"Betrayal", Eight, []suit{Wyrms, Knots}, []category{Event}},
+	{"Mill", Eight, []suit{Waves, Leaves}, []category{Place}},
+	{"Diplomat", Eight, []suit{Moons, Suns}, []category{Person}},
+	{"Merchant", Nine, []suit{Leaves, Knots}, []category{Person}},
+	{"Darkness", Nine, []suit{Waves, Wyrms}, []category{Place}},
+	{"Pact", Nine, []suit{Moons, Suns}, []category{Event}},
+	{"Calamity", Crown, []suit{Wyrms}, []category{Event}},
+	{"Huntress", Crown, []suit{Moons}, []category{Person}},
+	{"Bard", Crown, []suit{Suns}, []category{Person}},
+	{"Sea", Crown, []suit{Waves}, []category{Place}},
+	{"Windfall", Crown, []suit{Knots}, []category{Event}},
+	{"End", Crown, []suit{Leaves}, []category{Event, Place}},
 })
 
 func newDecktet(dc []*DecktetCard) *deck.Deck {
