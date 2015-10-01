@@ -21,14 +21,27 @@ type AdamanPlayer struct {
 func NewAdamanPlayer() *AdamanPlayer {
 	p := new(AdamanPlayer)
 	p.Deck = BasicDeck()
+
+	p.start()
+
+	return p
+}
+
+func (p *AdamanPlayer) start() {
 	p.resources = make([]*DecktetCard, 0, 5)
 	p.capital = make([]*DecktetCard, 0, 5)
 	p.palace = make([]*DecktetCard, 0, 5)
 	p.discard = make([]*DecktetCard, 0)
-
 	p.capitalClaims = make(map[*DecktetCard][]*DecktetCard)
 	p.palaceClaims = make(map[*DecktetCard][]*DecktetCard)
-	return p
+}
+
+func (p *AdamanPlayer) cleanup() {
+	p.Discard(toCardSlice(p.resources))
+	p.Discard(toCardSlice(p.capital))
+	p.Discard(toCardSlice(p.palace))
+	p.Discard(toCardSlice(p.discard))
+	p.start()
 }
 
 //func (p *AdamanPlayer) Shuffle(seed int) {
@@ -37,12 +50,14 @@ func NewAdamanPlayer() *AdamanPlayer {
 
 func (p *AdamanPlayer) AddCard(c deck.Card) {
 	dc := c.(*DecktetCard)
+	//fmt.Printf("Card dealt: %s\n", dc)
 	if len(p.resources) < 5 {
 		p.addResource(dc)
 	} else if len(p.capital) < 5 {
 		p.capital = append(p.capital, dc)
 	}
 	//return errors.New("shouldn't have drawn a card!")
+	//fmt.Println("shouldn't have drawn a card!")
 }
 
 func (p *AdamanPlayer) addResource(card *DecktetCard) {
@@ -57,12 +72,14 @@ func (p *AdamanPlayer) String() string {
 	pal := fmt.Sprintf("\nPalace:\n%v\n", printRow(p.palace))
 	c := fmt.Sprintf("Capital:\n%v\n", printRow(p.capital))
 	r := fmt.Sprintf("Resources:\n%v\n", printRow(p.resources))
+	k := fmt.Sprintf("Kills:\n%v\n", printRow(p.discard))
 
-	return pal + c + r
+	return pal + c + r + k
 }
 
 func (p *AdamanPlayer) dealAll() {
-	for len(p.capital) != 5 || len(p.resources) != 5 {
+	for len(p.capital) < 5 || len(p.resources) < 5 {
+		//for len(p.capital) != 5 || len(p.resources) != 5 {
 		if len(p.Cards()) == 0 {
 			return
 		}
@@ -189,12 +206,21 @@ func (p *AdamanPlayer) findCombos(target *DecktetCard, cards []*DecktetCard) (cl
 // find combos and evaluate for all targets
 // store the overages into a map of some kind
 func (p *AdamanPlayer) checkTargets() {
+	p.capitalClaims = make(map[*DecktetCard][]*DecktetCard)
+	p.palaceClaims = make(map[*DecktetCard][]*DecktetCard)
+
 	for _, c := range p.capital {
-		p.capitalClaims[c] = p.findCombos(c, p.resources)
+		if maybe := p.findCombos(c, p.resources); maybe != nil {
+			//fmt.Printf("p.target: %s, p.claim %s\n", c, maybe)
+			p.capitalClaims[c] = maybe
+		}
 	}
 
 	for _, c := range p.palace {
-		p.palaceClaims[c] = p.findCombos(c, p.resources)
+		if maybe := p.findCombos(c, p.resources); maybe != nil {
+			//fmt.Printf("p.target: %s, p.claim %s\n", c, maybe)
+			p.palaceClaims[c] = maybe
+		}
 	}
 
 }
@@ -202,7 +228,7 @@ func (p *AdamanPlayer) checkTargets() {
 // func decide
 // take the map from check targets
 // pick the best card to claim
-func (p *AdamanPlayer) decideEfficient() bool {
+/*func (p *AdamanPlayer) decideEfficient() bool {
 	var target *DecktetCard
 	var claim []*DecktetCard
 	var lowscore int = 100
@@ -232,7 +258,7 @@ func (p *AdamanPlayer) decideEfficient() bool {
 		p.claim(target, claim)
 		return true
 	}
-}
+}*/
 
 func (p *AdamanPlayer) decideAdj() bool {
 	var target *DecktetCard
@@ -308,17 +334,28 @@ func (p *AdamanPlayer) claim(target *DecktetCard, claim []*DecktetCard) {
 		}
 	}
 
+	failure := true
 	// remove claim cards from resource row
 	for _, c := range claim {
 		for i, v := range p.resources {
 			if c == v {
+				//fmt.Printf("claim: %s, resource: %s\n", c, v)
 				p.resources = append(p.resources[:i], p.resources[i+1:]...)
+				//fmt.Printf("resource: %s\n", p.resources)
+				failure = false
 				break
 			}
 		}
 	}
 
+	if failure {
+		fmt.Printf("Faulty Claim! %s\n", claim)
+	}
+
 	// discard all used cards
+	//TODO
+	p.Discard(toCardSlice(claim))
+
 	// make/add a count of how many cards have been claimed
 	if isPerson(target) {
 		p.discard = append(p.discard, target)
@@ -350,6 +387,7 @@ func (p *AdamanPlayer) Play() int {
 			p.dealAll()
 		}
 		//fmt.Println(p)
+		//fmt.Printf("cards: %d, discards: %d\n", len(p.Cards()), len(p.Discards()))
 		//fmt.Println(countSuits(deck.Shuffled, true))
 		//fmt.Println(countSuits(deck.Shuffled, false))
 		result = p.isGameOver()

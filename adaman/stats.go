@@ -9,21 +9,27 @@ import (
 	//"github.com/frenata/decktet"
 )
 
-func oneGame() int {
-	player := NewAdamanPlayer()
-
-	player.Shuffle(-1)
-
+func oneGame(player *AdamanPlayer) int {
+	player.Shuffle(1)
 	score := player.Play()
+
+	//fmt.Println(player)
+	//fmt.Println(player.discard)
+	//fmt.Println(len(player.Cards()))
+	player.cleanup()
+	//fmt.Printf("cards: %s\ndiscards: %s\n", player.Cards(), player.Discards())
+	player.Shuffle(1)
+	//fmt.Printf("cards: %s\ndiscards: %s\n", player.Cards(), player.Discards())
+	//fmt.Println(len(player.Cards()))
 	return score
 }
 
-func runStats(runs int) {
+func runStats(player *AdamanPlayer, runs int) {
 	stats := make(map[string]int)
 	var total, highscore int
 
 	for i := 0; i < runs; i++ {
-		score := oneGame()
+		score := oneGame(player)
 		total += score
 		switch {
 		case score == 0:
@@ -59,5 +65,6 @@ func main() {
 		runs, _ = strconv.Atoi(os.Args[1])
 	}
 
-	runStats(runs)
+	player := NewAdamanPlayer()
+	runStats(player, runs)
 }
