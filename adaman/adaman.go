@@ -8,8 +8,8 @@ import (
 )
 
 type AdamanPlayer struct {
-	name          string
-	deck          *deck.Deck
+	name string
+	*deck.Deck
 	resources     []*DecktetCard
 	capital       []*DecktetCard
 	palace        []*DecktetCard
@@ -20,7 +20,7 @@ type AdamanPlayer struct {
 
 func NewAdamanPlayer() *AdamanPlayer {
 	p := new(AdamanPlayer)
-	p.deck = NewDecktet(BasicDeck)
+	p.Deck = NewDecktet(BasicDeck)
 	p.resources = make([]*DecktetCard, 0, 5)
 	p.capital = make([]*DecktetCard, 0, 5)
 	p.palace = make([]*DecktetCard, 0, 5)
@@ -31,9 +31,9 @@ func NewAdamanPlayer() *AdamanPlayer {
 	return p
 }
 
-func (p *AdamanPlayer) Shuffle(seed int) {
-	p.deck.Shuffle(seed)
-}
+//func (p *AdamanPlayer) Shuffle(seed int) {
+//	p.Deck.Shuffle(seed)
+//}
 
 func (p *AdamanPlayer) AddCard(c deck.Card) {
 	dc := c.(*DecktetCard)
@@ -63,10 +63,10 @@ func (p *AdamanPlayer) String() string {
 
 func (p *AdamanPlayer) dealAll() {
 	for len(p.capital) != 5 || len(p.resources) != 5 {
-		if len(p.deck.Shuffled) == 0 {
+		if len(p.Cards()) == 0 {
 			return
 		}
-		p.deck.Deal(p)
+		p.Deal(p)
 		//fmt.Printf("left in (shuffled) deck: %v\n", len(d.Shuffled))
 	}
 }
@@ -121,7 +121,7 @@ func (p *AdamanPlayer) adjClaim(target *DecktetCard, cards []*DecktetCard) float
 }
 
 func (p *AdamanPlayer) cardValue(card *DecktetCard, target bool) (total float64) {
-	count := countSuits(p.deck.Shuffled, true)
+	count := countSuits(p.Cards(), true)
 	values := make(map[string]float64)
 
 	for k, v := range count {
@@ -346,7 +346,7 @@ func (p *AdamanPlayer) Play() int {
 	for result == "" {
 		round++
 		//fmt.Printf("Round %v!\n", round)
-		if len(p.deck.Shuffled) > 0 {
+		if len(p.Cards()) > 0 {
 			p.dealAll()
 		}
 		//fmt.Println(p)
