@@ -48,6 +48,7 @@ func playR(g *game) {
 	round++
 }
 
+// deal out cards, if the deck is depleted, first shuffle the discards back in
 func deal(g *game) {
 	fmt.Printf("Round %d!\n", round)
 	if len(g.cards.Cards()) == 2 || round == 1 {
@@ -58,11 +59,13 @@ func deal(g *game) {
 	status(g)
 }
 
+// print the hands of the players
 func status(g *game) {
 	fmt.Println(g.dummy)
 	fmt.Println(g.player)
 }
 
+// play a hand
 func hand(g *game) bool {
 	dc := g.dummy.play()
 	fmt.Printf("%s plays %s\n", g.dummy.name, dc)
@@ -82,6 +85,7 @@ func hand(g *game) bool {
 	return false
 }
 
+// did the player win the hand?
 func testWin(dc, pc, ace *decktet.DecktetCard) bool {
 	trump := ace.Suits()[0]
 	switch {
@@ -94,6 +98,7 @@ func testWin(dc, pc, ace *decktet.DecktetCard) bool {
 	}
 }
 
+// FollowSuit tests whether a given hand of cards *can* follow either suit on a card that has been led.
 func FollowSuit(card *decktet.DecktetCard, hand ...*decktet.DecktetCard) bool {
 	for _, s := range card.Suits() {
 		for _, c := range hand {
