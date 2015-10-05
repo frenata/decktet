@@ -90,6 +90,15 @@ func HasSuit(c *DecktetCard, s suit) bool {
 	return false
 }
 
+func (d *DecktetCard) HasSuit(s suit) bool {
+	for _, x := range d.Suits() {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
 func (d *DecktetCard) Cats() []category {
 	return d.cats
 }
