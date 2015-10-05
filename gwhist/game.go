@@ -10,6 +10,13 @@ var (
 	gaces *deck.Deck
 )
 
+// A player is a local interface that defines structs able to 'play' the game of gongor whist
+type player interface {
+	deck.Player
+	play(g *game, dc *decktet.DecktetCard) *decktet.DecktetCard
+	Name() string
+}
+
 // game status struct, holds the two decks, a dummy player, the actual player, and the bid status
 type game struct {
 	aces  *deck.Deck

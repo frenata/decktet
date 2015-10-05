@@ -7,18 +7,6 @@ import (
 	"github.com/frenata/decktet"
 )
 
-// implement various player for Gongor Whist
-// - Dummy
-// - AIPlayer
-// - Human
-
-// A player is a local interface that defines structs able to 'play' the game of gongor whist
-type player interface {
-	deck.Player
-	play(g *game, dc *decktet.DecktetCard) *decktet.DecktetCard
-	Name() string
-}
-
 // a dummy is the dummy hand in gongor whist, simply holding a stack of cards and mindlessly flipping them over
 type dummy struct {
 	name  string
