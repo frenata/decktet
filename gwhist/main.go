@@ -88,3 +88,14 @@ func testWin(dc, pc, ace *decktet.DecktetCard) bool {
 		return pc.Rank() > dc.Rank()
 	}
 }
+
+func FollowSuit(card *decktet.DecktetCard, hand ...*decktet.DecktetCard) bool {
+	for _, s := range card.Suits() {
+		for _, c := range hand {
+			if c.HasSuit(s) {
+				return true
+			}
+		}
+	}
+	return false
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/frenata/deck"
@@ -48,12 +49,30 @@ func (a *ai) String() string      { return a.name + ": " + decktet.ShortPrint(a.
 func (a *ai) Name() string        { return a.name }
 func (a *ai) AddCard(c deck.Card) { a.cards = append(a.cards, c.(*decktet.DecktetCard)) }
 func (a *ai) Play(g *game, dc *decktet.DecktetCard) *decktet.DecktetCard {
-	i := rand.Intn(len(a.cards))
-	c := a.cards[i]
+	var i int
+	if a.canFollow(dc) {
+		for yes := false; !yes; {
+			i = a.randCard()
+			yes = FollowSuit(dc, a.cards[i])
+		}
+	} else {
+		fmt.Println("can't follow suit")
+		i = a.randCard()
+	}
 
+	c := a.cards[i]
 	a.cards = append(a.cards[:i], a.cards[i+1:]...)
 	return c
 }
+
+func (a *ai) canFollow(dc *decktet.DecktetCard) bool {
+	return FollowSuit(dc, a.cards...)
+}
+
+func (a *ai) randCard() int {
+	return rand.Intn(len(a.cards))
+}
+
 func newAi(name string) player {
 	a := &ai{name: name}
 
