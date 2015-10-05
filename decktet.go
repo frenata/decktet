@@ -196,7 +196,7 @@ func BasicDeck() *deck.Deck {
 	return &bd
 }
 
-var basicDeck = newDecktet([]*DecktetCard{
+var basicDeck = NewDecktet([]*DecktetCard{
 	{"", Ace, []suit{Suns}, nil},
 	{"", Ace, []suit{Moons}, nil},
 	{"", Ace, []suit{Waves}, nil},
@@ -235,7 +235,7 @@ var basicDeck = newDecktet([]*DecktetCard{
 	{"End", Crown, []suit{Leaves}, []category{Event, Place}},
 })
 
-func newDecktet(dc []*DecktetCard) *deck.Deck {
+func NewDecktet(dc []*DecktetCard) *deck.Deck {
 	c := make([]deck.Card, len(dc))
 
 	for i := range dc {
