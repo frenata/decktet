@@ -183,6 +183,32 @@ func (a *ai) bestbid(g *game) int {
 		bid = int(f)
 	}
 
+	inc := true
+	if bid <= 3 {
+		inc = false
+	}
+
+	for g.bid[bid] {
+		//fmt.Println(g.bid)
+		fmt.Println("bid already taken, finding another")
+		fmt.Println(bid)
+		switch {
+		case bid == 7:
+			inc = false
+			bid--
+		case bid == 0:
+			inc = true
+			bid++
+		case inc:
+			bid++
+			//case !inc:
+		default:
+			bid--
+			/*default:
+			panic("can't bid")*/
+		}
+	}
+
 	a.bid = bid
 	return bid
 }

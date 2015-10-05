@@ -34,21 +34,58 @@ func main() {
 	playR(g)
 	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))*/
 
-	wins := 0
+	/*forewins := 0
+	aftwins := 0
 	games := 10000
 	for i := 0; i < games; i++ {
 		if playR(g) {
-			wins++
+			if i%2 == 0 {
+				forewins++
+			} else {
+				aftwins++
+			}
 		}
 	}
+	wins := forewins + aftwins
+	fmt.Printf("Played %d games, won %d games.\nWinPer is %f\n", games, wins, float64(wins)/float64(games))
+	fmt.Printf("Forewins %d in %d games.\nWinPer is %f\n", forewins, games/2, float64(forewins)/float64(games/2))
+	fmt.Printf("Aftwins %d in %d games.\nWinPer is %f\n", aftwins, games/2, float64(aftwins)/float64(games/2))*/
 
-	fmt.Printf("Played %d games, won %d games.\nWinPer is %f", games, wins, float64(wins)/float64(games))
+	wins := 0
+	rnds := 0
+	best := 0
+	nbest := 1
+	games := 1000000
+	for j := 0; j < games; j++ {
+		g.bid = [8]bool{}
+		for i := 1; i < 9; i++ {
+			res := playR(g)
+			if !res {
+				rnds = rnds + i
+				if i > best {
+					best = i
+					nbest = 1
+				}
+				if i == best {
+					nbest++
+				}
+				break
+			}
+			if i == 8 && res {
+				wins++
+			}
+		}
+	}
+	fmt.Printf("average round: %f\n", float64(rnds)/float64(games))
+	fmt.Printf("Best round: %d, done %d times.\n", best, nbest)
+	fmt.Printf("Played %d games, won %d games.\nWinPer is %f\n", games, wins, float64(wins)/float64(games))
 }
 
 // play a round
 func playR(g *game) bool {
 	deal(g)
-	fmt.Printf("Bid is %d\n", g.player.(*ai).bestbid(g))
+	bid := g.player.(*ai).bestbid(g)
+	fmt.Printf("Bid is %d\n", bid)
 	fmt.Printf("Trump is %s\n", g.trump().Suits()[0])
 	g.player.(*ai).score = 0
 
@@ -60,6 +97,7 @@ func playR(g *game) bool {
 	}
 	fmt.Printf("Won %d tricks.\n", score)
 	round++
+	g.bid[bid] = true
 	return g.player.(*ai).score == g.player.(*ai).bid
 }
 
