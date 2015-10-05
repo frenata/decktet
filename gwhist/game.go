@@ -76,3 +76,12 @@ func (g *game) deal() {
 func (g *game) trump() *decktet.DecktetCard {
 	return g.aces.Cards()[0].(*decktet.DecktetCard)
 }
+
+func (g *game) flipTrump() *decktet.DecktetCard {
+	if len(g.aces.Cards()) > 1 {
+		old := g.aces.Flip()
+		g.aces.Discard(old)
+		return g.aces.Cards()[0].(*decktet.DecktetCard)
+	}
+	return nil
+}

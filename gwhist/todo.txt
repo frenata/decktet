@@ -1,12 +1,12 @@
 Howto Pick a Card:
-1. Identify all the legal cards.
-2. Divide the legal cards into winning cards and losing cards.
-3. Recalculate expected "points" every hand.
-4. Expected - Needed = Tilt
-5. If Tilt is positive, try to lose.
-5b. If Tils is neagative, try to win.
-6. If want to lose, play highest losing card.
-6b. If want to win, play lowest winning card.
+*1. Identify all the legal cards.
+*2. Divide the legal cards into winning cards and losing cards.
+*3. Recalculate expected "points" every hand.
+*4. Expected - Needed = Tilt
+*5. If Tilt is positive, try to lose.
+*5b. If Tils is neagative, try to win.
+*6. If want to lose, play highest losing card.
+*6b. If want to win, play lowest winning card.
 7. Trump flipping? Three ideas
 7a. Flip the trump whenever you can't accomplish what you want.
 7b. Flip the trump only when not doing so costs the game.
@@ -15,18 +15,18 @@ Howto Pick a Card:
 
 
 Howto Bid:
-1. Count "winning" cards.
+*1. Count "winning" cards.
 - Crowns: 1
 - Nines: .5
 - etc...
 - Two: 0
 - Trumps: .5 (establish a floor value?) (or totally different scale?)
-2. First approx. pick the availble closest to your value
+*2. First approx. pick the availble closest to your value
 2b. Possislb future: skew extreme from your expected value?
 3. If not available, do something.
 
 Howto cehck for victory
-1. Did the bid get made?
+*1. Did the bid get made?
 2. What bids are left?
 3. If none, victory!
 
@@ -34,3 +34,13 @@ Statistics program
 
 Write Human Player options, via CLI
 -Write web interface
+
+
+interface changes:
+player
+ - Score()
+ - Bid()
+
+other changes:
+ - reduce stutter in package decktet
+ - add flags to main.go

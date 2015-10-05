@@ -59,12 +59,51 @@ func (a *ai) play(g *game, dc *decktet.DecktetCard) *decktet.DecktetCard {
 	if tilt < 0 {
 		fmt.Printf("want to win! tilt is %f\n", tilt)
 		c = decktet.Min(win)
+		if c == nil && tilt < -0.25 {
+			fmt.Printf("New Trump: %s\n", g.flipTrump())
+			plays = a.legalPlays(dc)
+			win, loss = a.findWinners(dc, g.trump(), plays)
+			c = decktet.Min(win)
+		}
+		if len(a.cards) <= a.need()+1 {
+			//if true {
+			for c == nil {
+				fmt.Println("still no win")
+				newt := g.flipTrump()
+				if newt == nil {
+					break
+				}
+				fmt.Printf("New Trump: %s\n", newt)
+				plays = a.legalPlays(dc)
+				win, loss = a.findWinners(dc, g.trump(), plays)
+				c = decktet.Min(win)
+			}
+		}
 		if c == nil {
 			c = decktet.Min(loss)
 		}
 	} else {
 		fmt.Printf("want to lose! tilt is %f\n", tilt)
 		c = decktet.Max(loss)
+		if c == nil && tilt > 0.15 {
+			fmt.Printf("New Trump: %s\n", g.flipTrump())
+			plays = a.legalPlays(dc)
+			win, loss = a.findWinners(dc, g.trump(), plays)
+			c = decktet.Max(loss)
+		}
+		if a.score == a.bid {
+			for c == nil {
+				fmt.Println("still no loss")
+				newt := g.flipTrump()
+				if newt == nil {
+					break
+				}
+				fmt.Printf("New Trump: %s\n", newt)
+				plays = a.legalPlays(dc)
+				win, loss = a.findWinners(dc, g.trump(), plays)
+				c = decktet.Max(loss)
+			}
+		}
 		if c == nil {
 			c = decktet.Max(win)
 		}
@@ -122,8 +161,9 @@ func (a *ai) findWinners(dc, ace *decktet.DecktetCard, cards []*decktet.DecktetC
 	for _, c := range cards {
 		if testWin(dc, c, ace) {
 			win = append(win, c)
+		} else {
+			loss = append(loss, c)
 		}
-		loss = append(loss, c)
 	}
 	return win, loss
 }

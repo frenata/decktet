@@ -49,6 +49,7 @@ func main() {
 func playR(g *game) bool {
 	deal(g)
 	fmt.Printf("Bid is %d\n", g.player.(*ai).bestbid(g))
+	fmt.Printf("Trump is %s\n", g.trump().Suits()[0])
 	g.player.(*ai).score = 0
 
 	score := 0
