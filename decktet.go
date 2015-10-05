@@ -90,6 +90,32 @@ func HasSuit(c *DecktetCard, s suit) bool {
 	return false
 }
 
+func Max(cards []*DecktetCard) *DecktetCard {
+	if len(cards) != 0 {
+		max := cards[0]
+		for i, c := range cards {
+			if c.rank > max.rank {
+				max = c
+			}
+		}
+		return max
+	}
+	return nil
+}
+
+func Min(cards []*DecktetCard) *DecktetCard {
+	if len(cards) != 0 {
+		min := cards[0]
+		for i, c := range cards {
+			if c.rank < min.rank {
+				min = c
+			}
+		}
+		return min
+	}
+	return nil
+}
+
 func (d *DecktetCard) HasSuit(s suit) bool {
 	for _, x := range d.Suits() {
 		if x == s {
