@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
 	"math/rand"
 
 	"github.com/frenata/deck"
@@ -13,6 +14,8 @@ import (
 type ai struct {
 	name  string
 	cards []*decktet.DecktetCard
+	bid   int
+	score int
 }
 
 // create a new named ai player
@@ -50,12 +53,21 @@ func (a *ai) play(g *game, dc *decktet.DecktetCard) *decktet.DecktetCard {
 
 	plays := a.legalPlays(dc)
 	win, loss := a.findWinners(dc, g.trump(), plays)
-	if len(win) > 1 {
-		fmt.Println(win)
-	}
-	c := decktet.Min(win)
-	if c == nil {
-		c = decktet.Min(loss)
+
+	var c *decktet.DecktetCard
+	tilt := a.tilt(g.trump())
+	if tilt < 0 {
+		fmt.Printf("want to win! tilt is %f\n", tilt)
+		c = decktet.Min(win)
+		if c == nil {
+			c = decktet.Min(loss)
+		}
+	} else {
+		fmt.Printf("want to lose! tilt is %f\n", tilt)
+		c = decktet.Max(loss)
+		if c == nil {
+			c = decktet.Max(win)
+		}
 	}
 
 	if a.pop(c) {
@@ -114,4 +126,65 @@ func (a *ai) findWinners(dc, ace *decktet.DecktetCard, cards []*decktet.DecktetC
 		loss = append(loss, c)
 	}
 	return win, loss
+}
+
+// Functions for bidding, evalutating
+
+func (a *ai) bestbid(g *game) int {
+	var bid int
+	guess := a.guess(g.trump())
+
+	c := math.Ceil(guess)
+	f := math.Floor(guess)
+
+	if math.Abs(c-guess) < math.Abs(guess-f) {
+		bid = int(c)
+	} else {
+		bid = int(f)
+	}
+
+	a.bid = bid
+	return bid
+}
+
+func (a *ai) guess(ace *decktet.DecktetCard) (p float64) {
+	for _, c := range a.cards {
+		var value float64
+		switch {
+		case c.Rank() == decktet.Crown:
+			value = .95
+		case c.Rank() == decktet.Nine:
+			value = .75
+		case c.Rank() == decktet.Eight:
+			value = .55
+		case c.Rank() == decktet.Seven:
+			value = .35
+		case c.Rank() == decktet.Six:
+			value = .15
+		default:
+			value = .05
+		}
+
+		if decktet.SuitMatch(c, ace) {
+			value = value + value
+			if value > 1 {
+				value = 1
+			}
+			if value < .25 {
+				value = .25
+			}
+		}
+		//		fmt.Printf("%s estimated value is %f\n", c, value)
+		p += value
+	}
+	return p
+}
+
+func (a *ai) need() int {
+	return a.bid - a.score
+}
+
+func (a *ai) tilt(ace *decktet.DecktetCard) float64 {
+	g := a.guess(ace)
+	return g - float64(a.need())
 }

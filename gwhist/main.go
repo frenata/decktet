@@ -24,20 +24,33 @@ func main() {
 	g := newGame(newDummy("dummy"), newAi("tommy"))
 
 	// for testing, can set a random seed here
-	g.cards.Seed(1)
+	g.cards.Seed(-1)
 
 	// full round not yet implemented, for now just play 3 rounds and output results
-	playR(g)
+	/*playR(g)
 	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))
 	playR(g)
 	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))
 	playR(g)
-	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))
+	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))*/
+
+	wins := 0
+	games := 10000
+	for i := 0; i < games; i++ {
+		if playR(g) {
+			wins++
+		}
+	}
+
+	fmt.Printf("Played %d games, won %d games.\nWinPer is %f", games, wins, float64(wins)/float64(games))
 }
 
 // play a round
-func playR(g *game) {
+func playR(g *game) bool {
 	deal(g)
+	fmt.Printf("Bid is %d\n", g.player.(*ai).bestbid(g))
+	g.player.(*ai).score = 0
+
 	score := 0
 	for i := 0; i < 7; i++ {
 		if hand(g) {
@@ -46,6 +59,7 @@ func playR(g *game) {
 	}
 	fmt.Printf("Won %d tricks.\n", score)
 	round++
+	return g.player.(*ai).score == g.player.(*ai).bid
 }
 
 // deal out cards, if the deck is depleted, first shuffle the discards back in
@@ -78,7 +92,8 @@ func hand(g *game) bool {
 
 	defer g.cards.Discard(dc, pc)
 	if testWin(dc, pc, ace) {
-		fmt.Println("player wins")
+		g.player.(*ai).score++
+		fmt.Printf("player wins, score is %d\n", g.player.(*ai).score)
 		return true
 	}
 
