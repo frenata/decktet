@@ -1,3 +1,4 @@
+// A CLI interface for Gongor Whist, playable by input or by ai (with stats)
 package main
 
 import (
@@ -19,10 +20,13 @@ var round int = 1
 func main() {
 	fmt.Println("Gongor Whist!")
 
-	g := New(newDummy("dummy"), newAi("tommy"))
+	// create some players
+	g := newGame(newDummy("dummy"), newAi("tommy"))
 
-	g.cards.Seed(2)
+	// for testing, can set a random seed here
+	g.cards.Seed(1)
 
+	// full round not yet implemented, for now just play 3 rounds and output results
 	playR(g)
 	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))
 	playR(g)
@@ -31,6 +35,7 @@ func main() {
 	fmt.Println(len(g.cards.Cards()), len(g.cards.Discards()))
 }
 
+// play a round
 func playR(g *game) {
 	deal(g)
 	score := 0
@@ -59,13 +64,13 @@ func status(g *game) {
 }
 
 func hand(g *game) bool {
-	dc := g.dummy.Play()
+	dc := g.dummy.play()
 	fmt.Printf("%s plays %s\n", g.dummy.name, dc)
 
 	ace := g.trump()
 	//fmt.Printf("Trump is %s\n", ace)
 
-	pc := g.player.Play(g, dc)
+	pc := g.player.play(g, dc)
 	fmt.Printf("%s plays %s\n", g.player.Name(), pc)
 
 	defer g.cards.Discard(dc, pc)

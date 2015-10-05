@@ -10,14 +10,16 @@ var (
 	gaces *deck.Deck
 )
 
+// game status struct, holds the two decks, a dummy player, the actual player, and the bid status
 type game struct {
 	aces  *deck.Deck
 	cards *deck.Deck
 	*dummy
 	player
-	bid [8]bool
+	bid [8]bool // a true bid means it has been bid and made previously
 }
 
+// split up the standard decktet on import
 func init() {
 	cards := decktet.BasicDeck().Cards()
 	d := make([]*decktet.DecktetCard, 30)
@@ -41,18 +43,21 @@ func init() {
 	//fmt.Printf("Deck:\n%s\n\nAces:\n%s\n\n", Deck, Aces)
 }
 
-func New(d dummy, p player) *game {
+// start a new game of Gongor Whist
+func newGame(d dummy, p player) *game {
 	g := &game{aces: gaces, cards: gdeck}
 	g.dummy = &d
 	g.player = p
 	return g
 }
 
+// when shuffling, shuffle both decks
 func (g *game) shuffle() {
 	g.aces.Shuffle()
 	g.cards.Shuffle()
 }
 
+// deal out 7 cards to each player
 func (g *game) deal() {
 	for i := 0; i < 7; i++ {
 		g.cards.Deal(g.dummy)
@@ -60,6 +65,7 @@ func (g *game) deal() {
 	}
 }
 
+// trump is always the top card on the aces stack
 func (g *game) trump() *decktet.DecktetCard {
 	return g.aces.Cards()[0].(*decktet.DecktetCard)
 }
