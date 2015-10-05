@@ -93,7 +93,7 @@ func HasSuit(c *DecktetCard, s suit) bool {
 func Max(cards []*DecktetCard) *DecktetCard {
 	if len(cards) != 0 {
 		max := cards[0]
-		for i, c := range cards {
+		for _, c := range cards {
 			if c.rank > max.rank {
 				max = c
 			}
@@ -106,7 +106,7 @@ func Max(cards []*DecktetCard) *DecktetCard {
 func Min(cards []*DecktetCard) *DecktetCard {
 	if len(cards) != 0 {
 		min := cards[0]
-		for i, c := range cards {
+		for _, c := range cards {
 			if c.rank < min.rank {
 				min = c
 			}
