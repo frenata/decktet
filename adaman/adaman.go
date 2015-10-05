@@ -37,10 +37,10 @@ func (p *AdamanPlayer) start() {
 }
 
 func (p *AdamanPlayer) cleanup() {
-	p.Discard(toCardSlice(p.resources))
-	p.Discard(toCardSlice(p.capital))
-	p.Discard(toCardSlice(p.palace))
-	p.Discard(toCardSlice(p.discard))
+	p.Discard(toCardSlice(p.resources)...)
+	p.Discard(toCardSlice(p.capital)...)
+	p.Discard(toCardSlice(p.palace)...)
+	p.Discard(toCardSlice(p.discard)...)
 	p.start()
 }
 
@@ -354,7 +354,7 @@ func (p *AdamanPlayer) claim(target *DecktetCard, claim []*DecktetCard) {
 
 	// discard all used cards
 	//TODO
-	p.Discard(toCardSlice(claim))
+	p.Discard(toCardSlice(claim)...)
 
 	// make/add a count of how many cards have been claimed
 	if isPerson(target) {
